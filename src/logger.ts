@@ -41,10 +41,11 @@ export default function(cfg: config): logger {
   }
 
   function log(msg: string, level: keyof typeof colors): void {
-    if (cfg.timestamp) msg = color(fmt(cfg.timestamp), '30;1') + ' ' + msg;
     const c = colors[level || 'log'];
+    msg = '[' + color(level.toUpperCase(), c) + '] ' + msg;
+    if (cfg.timestamp) msg = color(fmt(cfg.timestamp), '30;1') + ' ' + msg;
     // eslint-disable-next-line no-console
-    console.log('[' + color(level.toUpperCase(), c) + '] ' + msg);
+    console.log(msg);
   }
 
   log.debug = function(format: string, ...param: string[]): void {
