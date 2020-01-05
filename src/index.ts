@@ -4,7 +4,7 @@ import logger from './logger';
 
 export default class SaberAlter {
   public static readonly log = logger({
-    timestamp: 'HH:MM:ss',
+    timestamp: 'mm/dd/yy HH:MM:ss',
     debug: process.env.NODE_ENV !== 'production',
   });
 
