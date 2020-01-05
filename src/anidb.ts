@@ -204,9 +204,10 @@ export default class anidb {
     }
   }
 
-  public getShowData(id: string): Promise<AnimeResponse> {
-    const cacheFilePath = path.join(this.cacheDir, id);
-
+  public getShowData(
+    id: string,
+    cacheFilePath: string = path.join(this.cacheDir, id),
+  ): Promise<AnimeResponse> {
     // check if we have a cached response for this id
     if (fs.existsSync(cacheFilePath)) {
       // we have a cached file
@@ -232,6 +233,8 @@ export default class anidb {
 
   private async requestShowData(cacheFilePath: string, id: string): Promise<AnimeResponse> {
     const release = await this.mutex.acquire(); // wait till a request is possible
+    // double check that this file still isn't in the cache (for duplicate links)
+    if (fs.existsSync(cacheFilePath)) return this.getShowData(id, cacheFilePath);
     return axios
       .get(this.baseUrl + '&request=anime&aid=' + id)
       .then((response: AxiosResponse) => {
