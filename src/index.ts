@@ -33,16 +33,15 @@ export default class SaberAlter {
             .then(data => {
               const embed = new Discord.RichEmbed();
               embed.setTitle(data.anime.titles[0].title[0]._);
-              embed.setDescription(
-                '**Episodes:** ' +
-                  data.anime.episodecount[0] +
-                  '\n' +
-                  '**Description:** \n' +
-                  '>>> ' +
-                  SaberAlter.escapeDiscordMessage(data.anime.description[0]),
+              embed.setAuthor(
+                data.anime.url[0],
+                'https://cdn.anidb.net/css/icons/touch/favicon-32x32.png',
+                data.anime.url[0],
               );
+              embed.setDescription(SaberAlter.escapeDiscordMessage(data.anime.description[0]));
               embed.setThumbnail('https://cdn.anidb.net/images/main/' + data.anime.picture);
-              embed.setURL(data.anime.url[0]);
+              embed.setURL(match[0]);
+              embed.addField('Episodes', data.anime.episodecount[0]);
               return message.channel.send(embed);
             })
             .catch(err => {
