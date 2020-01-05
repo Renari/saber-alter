@@ -108,3 +108,6 @@ anidbCache/
 
 # JetBrains IDE directory
 .idea/
+
+# build files
+build/
