@@ -239,13 +239,14 @@ export default class anidb {
         return this.writeFile(cacheFilePath, response.data).then(() => {
           SaberAlter.log.info('received show ' + id + ' from anidb');
           return this.xmlParser.parseStringPromise(response.data).then(parsed => {
+            if (parsed.error) throw parsed.error;
             return parsed as AnimeResponse;
           });
         });
       })
       .finally(() => {
         new Promise(resolve => {
-          setTimeout(resolve, 2000);
+          setTimeout(resolve, 2000); // wait 2 seconds to avoid being banned by anidb
         }).then(() => {
           release(); // release mutux so next request can happen
         });
