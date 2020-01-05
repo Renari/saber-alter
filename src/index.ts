@@ -12,10 +12,9 @@ export default class SaberAlter {
     // escape all markdown symbols
     message = message.replace(/([*`_~>])/gm, '\\$1');
     // replace anidb syntax with markdown link syntax
-    message = message.replace(
-      /(https?:\/\/(?:www\.)?anidb\.net\/\S+) \[((?:\w+\s?)*)]/gm,
-      '[$2]($1)',
-    );
+    message = message.replace(/(https?:\/\/(?:www\.)?anidb\.net\/\S+) \[(.+?(?=]))/gm, '[$2]($1)');
+    // italics [i] [/i] to *
+    message = message.replace(/\[\/?i]/gm, '*');
     return message;
   }
 
