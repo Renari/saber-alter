@@ -25,19 +25,24 @@ export default class SaberAlter {
     this.discordClient = new Discord.Client();
     this.anidbClient = new anidb();
 
-    this.discordClient.once('ready', () => {
-      SaberAlter.log.info('discord connection successful');
-      this.discordClient.on('message', this.messageHandler);
-    });
+    this.discordClient.once('ready', () => this.ready());
 
+    // connect to discord
     this.discordClient.login(process.env.DISCORD_TOKEN).catch(err => {
       SaberAlter.log.error(err);
     });
   }
 
+  private ready(): void {
+    SaberAlter.log.info('discord connection successful');
+    this.discordClient.on('message', message => this.messageHandler(message));
+  }
+
   private messageHandler(message: Discord.Message): void {
-    const match = message.content.match(/https?:\/\/(?:www\.)?anidb\.net\/a(?:nime\/)?(\d+)/gm);
-    if (match) {
+    const matches = [
+      ...message.content.matchAll(/https?:\/\/(?:www\.)?anidb\.net\/a(?:nime\/)?(\d+)/gi),
+    ];
+    matches.forEach(match => {
       this.anidbClient
         .getShowData(match[1])
         .then(data => {
@@ -57,7 +62,7 @@ export default class SaberAlter {
         .catch(err => {
           SaberAlter.log.error(err);
         });
-    }
+    });
   }
 }
 
