@@ -5,7 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "ts-node-dev -P tsconfig.json --respawn --transpileOnly src/index.ts",
-    "lint": "eslint --fix ./**/*.ts"
+    "lint": "eslint --ignore-path .gitignore --fix ./**/*.ts",
+    "build": "tsc -p tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -44,7 +45,7 @@
   },
   "lint-staged": {
     "*.{js,ts}": [
-      "eslint --fix ",
+      "eslint --ignore-path .gitignore --fix ",
       "git add"
     ]
   }
