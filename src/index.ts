@@ -8,7 +8,7 @@ export default class SaberAlter {
     debug: process.env.NODE_ENV !== 'production',
   });
 
-  private static escapeDiscordMessage(message: string): string {
+  private static formatDiscordMessage(message: string): string {
     // escape all markdown symbols
     message = message.replace(/([*`_~>])/gm, '\\$1');
     // replace anidb syntax with markdown link syntax
@@ -38,7 +38,7 @@ export default class SaberAlter {
                 'https://cdn.anidb.net/css/icons/touch/favicon-32x32.png',
                 data.anime.url[0],
               );
-              embed.setDescription(SaberAlter.escapeDiscordMessage(data.anime.description[0]));
+              embed.setDescription(SaberAlter.formatDiscordMessage(data.anime.description[0]));
               embed.setThumbnail('https://cdn.anidb.net/images/main/' + data.anime.picture);
               embed.setURL(match[0]);
               embed.addField('Episodes', data.anime.episodecount[0]);
