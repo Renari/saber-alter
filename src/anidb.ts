@@ -217,12 +217,7 @@ export default class anidb {
           this.unlink(cacheFilePath).catch(); // ignore errors while trying to delete
           return this.requestShowData(cacheFilePath, id);
         } else {
-          return this.readFile(cacheFilePath).then(buffer => {
-            SaberAlter.log.info('received show ' + id + ' from cache');
-            return this.xmlParser.parseStringPromise(buffer.toString()).then(parsed => {
-              return parsed as AnimeResponse;
-            });
-          });
+          return this.getCacheFile(cacheFilePath);
         }
       });
     } else {
@@ -231,10 +226,19 @@ export default class anidb {
     }
   }
 
+  private getCacheFile(cacheFilePath: string): Promise<AnimeResponse> {
+    return this.readFile(cacheFilePath).then(buffer => {
+      SaberAlter.log.info('received show ' + id + ' from cache');
+      return this.xmlParser.parseStringPromise(buffer.toString()).then(parsed => {
+        return parsed as AnimeResponse;
+      });
+    });
+  }
+
   private async requestShowData(cacheFilePath: string, id: string): Promise<AnimeResponse> {
     const release = await this.mutex.acquire(); // wait till a request is possible
     // double check that this file still isn't in the cache (for duplicate links)
-    if (fs.existsSync(cacheFilePath)) return this.getShowData(id, cacheFilePath);
+    if (fs.existsSync(cacheFilePath)) return this.getCacheFile(cacheFilePath);
     return axios
       .get(this.baseUrl + '&request=anime&aid=' + id)
       .then((response: AxiosResponse) => {
