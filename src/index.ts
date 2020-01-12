@@ -63,14 +63,13 @@ export default class SaberAlter {
   }
 
   private embedChecker(message: Discord.Message): void {
-    SaberAlter.log.info('Updated called for ' + message.content);
     if (message.embeds.length) {
       // this message contains a pixiv link and a embed, so remove the embed
       const match = message.content.match(
         /https?:\/\/(?:www\.)?pixiv.net\/(?:\w+\/)*artworks\/(\d+)/gi,
       );
       if (match) {
-        //message.suppressEmbeds().catch(err => SaberAlter.log.error(err));
+        message.suppressEmbeds().catch(err => SaberAlter.log.error(err));
       }
     }
   }
