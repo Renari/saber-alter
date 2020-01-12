@@ -103,9 +103,6 @@ export default class SaberAlter {
             .addField('Episodes', data.anime.episodecount[0]);
           return message.channel.send(embed);
         })
-        .then(() => {
-          return message.suppressEmbeds(); // this is horrible
-        })
         .catch(err => {
           SaberAlter.log.error(err);
         });
@@ -177,6 +174,9 @@ export default class SaberAlter {
                 return message.channel.send(embed);
               });
             });
+        })
+        .then(() => {
+          return message.suppressEmbeds(); // this is horrible
         })
         .catch(err => {
           SaberAlter.log.error(err);
