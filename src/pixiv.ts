@@ -7,13 +7,29 @@ export default class pixiv {
   private pixivApi: PixivAppApi;
   constructor() {
     this.pixivApi = new PixivAppApi(process.env.PIXIV_USERNAME, process.env.PIXIV_PASSWORD);
-    this.pixivApi.login().catch(err => SaberAlter.log.error(err));
+  }
+
+  private checkAuth(): Promise<void> {
+    return new Promise(resolve => {
+      if (!this.pixivApi.auth) {
+        return this.pixivApi.login().then(() => {
+          SaberAlter.log.info('Pixiv login successful');
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
   }
 
   public getImageDetail(id: number): Promise<PixivIllustDetail> {
-    return this.pixivApi.illustDetail(id).then(imageMetadata => {
-      return imageMetadata;
-    });
+    return this.checkAuth()
+      .then(() => {
+        return this.pixivApi.illustDetail(id);
+      })
+      .then(imageMetadata => {
+        return imageMetadata;
+      });
   }
 
   public getImage(imageMetadata: PixivIllustDetail): Promise<Buffer> {
