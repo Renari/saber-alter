@@ -32,9 +32,7 @@ export default class SaberAlter {
     this.discordClient.once('ready', () => this.ready());
 
     // connect to discord
-    this.discordClient.login(process.env.DISCORD_TOKEN).catch(err => {
-      SaberAlter.log.error(err);
-    });
+    this.discordClient.login(process.env.DISCORD_TOKEN).catch(SaberAlter.log.error);
   }
 
   private ready(): void {
@@ -52,30 +50,30 @@ export default class SaberAlter {
       }
     });
 
-    // this.discordClient.on('messageUpdate', (oldMessage, newMessage) => {
-    //   if (newMessage.partial) {
-    //     newMessage
-    //       .fetch()
-    //       .then(fullMessage => this.embedChecker(fullMessage))
-    //       .catch(err => SaberAlter.log.error(err));
-    //   } else {
-    //     this.embedChecker(newMessage);
-    //   }
-    // });
+    this.discordClient.on('messageUpdate', (oldMessage, newMessage) => {
+      if (newMessage.partial) {
+        newMessage
+          .fetch()
+          .then(fullMessage => this.embedChecker(fullMessage))
+          .catch(SaberAlter.log.error);
+      } else {
+        this.embedChecker(newMessage);
+      }
+    });
   }
 
-  // private embedChecker(message: Discord.Message): void {
-  //   SaberAlter.log.info('Updated called for ' + message.content);
-  //   if (message.embeds.length) {
-  //     // this message contains a pixiv link and a embed, so remove the embed
-  //     const match = message.content.match(
-  //       /https?:\/\/(?:www\.)?pixiv.net\/(?:\w+\/)*artworks\/(\d+)/gi,
-  //     );
-  //     if (match) {
-  //       //message.suppressEmbeds().catch(err => SaberAlter.log.error(err));
-  //     }
-  //   }
-  // }
+  private embedChecker(message: Discord.Message): void {
+    SaberAlter.log.info('Updated called for ' + message.content);
+    if (message.embeds.length) {
+      // this message contains a pixiv link and a embed, so remove the embed
+      const match = message.content.match(
+        /https?:\/\/(?:www\.)?pixiv.net\/(?:\w+\/)*artworks\/(\d+)/gi,
+      );
+      if (match) {
+        //message.suppressEmbeds().catch(err => SaberAlter.log.error(err));
+      }
+    }
+  }
 
   private messageHandler(message: Discord.Message): void {
     // ignore own messages
@@ -103,9 +101,7 @@ export default class SaberAlter {
             .addField('Episodes', data.anime.episodecount[0]);
           return message.channel.send(embed);
         })
-        .catch(err => {
-          SaberAlter.log.error(err);
-        });
+        .catch(SaberAlter.log.error);
     });
     /**
      * Pixiv Embeds
@@ -113,6 +109,13 @@ export default class SaberAlter {
     const pixivIllustMatches = [
       ...message.content.matchAll(/https?:\/\/(?:www\.)?pixiv.net\/(?:\w+\/)*artworks\/(\d+)/gi),
     ];
+    if (pixivIllustMatches.length > 0 && message.embeds.length) {
+      /**
+       * if this message is in discords cache the embed will be attached already
+       * if it is not in discords cache it'll get added by a messageUpdate call
+       */
+      message.suppressEmbeds().catch(SaberAlter.log.error);
+    }
     pixivIllustMatches.forEach(match => {
       this.pixivClient
         .getImageDetail(parseInt(match[1]))
@@ -175,12 +178,7 @@ export default class SaberAlter {
               });
             });
         })
-        .then(() => {
-          return message.suppressEmbeds(); // this is horrible
-        })
-        .catch(err => {
-          SaberAlter.log.error(err);
-        });
+        .catch(SaberAlter.log.error);
     });
   }
 }
