@@ -39,25 +39,47 @@ export default class SaberAlter {
 
   private ready(): void {
     SaberAlter.log.info('discord connection successful');
-    this.discordClient.on('message', message => this.messageHandler(message));
-    this.discordClient.on('messageUpdate', message => this.embedChecker(message));
+    this.discordClient.on('message', message => {
+      if (message.partial) {
+        message
+          .fetch()
+          .then(fullMessage => {
+            this.messageHandler(fullMessage);
+          })
+          .catch(err => SaberAlter.log.error(err));
+      } else {
+        this.messageHandler(message);
+      }
+    });
+
+    // this.discordClient.on('messageUpdate', (oldMessage, newMessage) => {
+    //   if (newMessage.partial) {
+    //     newMessage
+    //       .fetch()
+    //       .then(fullMessage => this.embedChecker(fullMessage))
+    //       .catch(err => SaberAlter.log.error(err));
+    //   } else {
+    //     this.embedChecker(newMessage);
+    //   }
+    // });
   }
 
-  private embedChecker(message: Discord.Message): void {
-    if (message.embeds.length) {
-      // this message contains a pixiv link and a embed, so remove the embed
-      const match = message.content.match(
-        /https?:\/\/(?:www\.)?pixiv.net\/(?:\w+\/)*artworks\/(\d+)/gi,
-      );
-      if (match) {
-        message.suppressEmbeds().catch(err => SaberAlter.log.error(err));
-      }
-    }
-  }
+  // private embedChecker(message: Discord.Message): void {
+  //   SaberAlter.log.info('Updated called for ' + message.content);
+  //   if (message.embeds.length) {
+  //     // this message contains a pixiv link and a embed, so remove the embed
+  //     const match = message.content.match(
+  //       /https?:\/\/(?:www\.)?pixiv.net\/(?:\w+\/)*artworks\/(\d+)/gi,
+  //     );
+  //     if (match) {
+  //       //message.suppressEmbeds().catch(err => SaberAlter.log.error(err));
+  //     }
+  //   }
+  // }
 
   private messageHandler(message: Discord.Message): void {
     // ignore own messages
-    if (message.author.equals(this.discordClient.user)) return;
+    if (this.discordClient.user && message.author.equals(this.discordClient.user)) return;
     /**
      * AniDB anime embed
      */
@@ -68,7 +90,7 @@ export default class SaberAlter {
       this.anidbClient
         .getShowData(match[1])
         .then(data => {
-          const embed = new Discord.RichEmbed()
+          const embed = new Discord.MessageEmbed()
             .setTitle(data.anime.titles[0].title[0]._)
             .setAuthor(
               data.anime.url[0],
@@ -80,6 +102,9 @@ export default class SaberAlter {
             .setURL(match[0])
             .addField('Episodes', data.anime.episodecount[0]);
           return message.channel.send(embed);
+        })
+        .then(() => {
+          return message.suppressEmbeds(); // this is horrible
         })
         .catch(err => {
           SaberAlter.log.error(err);
@@ -131,12 +156,12 @@ export default class SaberAlter {
                   .replace(/<a[^>]*href=["|']([^"']*)[^>]*>([^<]+)<\/a>/gi, '[$2]($1)')
                   .replace(/<br\s*\/?>/gi, '\n');
                 const embedFileName = imageData.resized ? match[0] + '.png' : fileName;
-                const embed = new Discord.RichEmbed()
+                const embed = new Discord.MessageEmbed()
                   .setTitle(imageMetadata.illust.title)
                   .setDescription(description)
                   .attachFiles([
-                    new Discord.Attachment(imageData.image, embedFileName),
-                    new Discord.Attachment(avatar, 'avatar.jpg'),
+                    new Discord.MessageAttachment(imageData.image, embedFileName),
+                    new Discord.MessageAttachment(avatar, 'avatar.jpg'),
                   ])
                   .setAuthor('Pixiv', 'https://s.pximg.net/common/images/apple-touch-icon.png')
                   .setImage('attachment://' + embedFileName)
