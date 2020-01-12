@@ -144,9 +144,9 @@ export default class SaberAlter {
                     imageMetadata.illust.user.name +
                       ' | ' +
                       (imageData.resized ? 'Resized' : 'Original') +
-                      (imageMetadata.illust.metaPages.length > 1)
-                      ? ' | 1/' + imageMetadata.illust.metaPages.length
-                      : '',
+                      (imageMetadata.illust.metaPages.length > 0
+                        ? ' | 1/' + imageMetadata.illust.metaPages.length
+                        : ''),
                     'attachment://avatar.jpg',
                   );
                 return message.channel.send(embed);
