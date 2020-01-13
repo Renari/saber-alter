@@ -169,7 +169,7 @@ export default class SaberAlter {
                       ' | ' +
                       (imageData.resized ? 'Resized' : 'Original') +
                       (imageMetadata.illust.metaPages.length > 0
-                        ? ' | 1/' + imageMetadata.illust.metaPages.length
+                        ? ' | 1 of ' + imageMetadata.illust.metaPages.length + ' images'
                         : ''),
                     'attachment://avatar.jpg',
                   );
