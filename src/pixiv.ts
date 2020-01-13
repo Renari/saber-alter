@@ -33,9 +33,9 @@ export default class pixiv {
   }
 
   public getImage(imageMetadata: PixivIllustDetail): Promise<Buffer> {
-    const image = imageMetadata.illust.metaSinglePage.originalImageUrl
-      ? imageMetadata.illust.metaSinglePage.originalImageUrl
-      : imageMetadata.illust.metaPages[0].imageUrls.original;
+    const image = imageMetadata.illust.imageUrls.large
+      ? imageMetadata.illust.imageUrls.large
+      : imageMetadata.illust.imageUrls.medium;
     return this.imageRequest(image);
   }
 
