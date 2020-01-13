@@ -11,7 +11,7 @@ export default class pixiv {
 
   private checkAuth(): Promise<void> {
     return new Promise(resolve => {
-      if (!this.pixivApi.auth) {
+      if (!this.pixivApi.auth || this.pixivApi.authInfo().expiresIn <= 0) {
         return this.pixivApi.login().then(() => {
           SaberAlter.log.info('Pixiv login successful');
           resolve();
