@@ -1,6 +1,5 @@
 import anidb from './anidb';
 import Discord from 'discord.js';
-import * as gm from './graphicsmagick';
 import logger from './logger';
 import pixiv from './pixiv';
 
@@ -126,56 +125,31 @@ export default class SaberAlter {
           if (extensionMatch === null || extensionMatch.length !== 1)
             throw 'Failed to get extension for url ' + imageUrl;
           const fileName = match[1] + extensionMatch[0];
-          this.pixivClient
-            .getImage(imageMetadata)
-            .then(buffer => {
-              // 8MB
-              if (buffer.length > 8388608) {
-                return gm
-                  .scaleImageToSize(
-                    buffer,
-                    fileName,
-                    imageMetadata.illust.width,
-                    imageMetadata.illust.height,
-                    8388608,
-                  )
-                  .then(buffer => {
-                    return {
-                      resized: true,
-                      image: buffer,
-                    };
-                  });
-              } else {
-                return { resized: false, image: buffer };
-              }
-            })
-            .then(imageData => {
-              return this.pixivClient.getAvatar(imageMetadata).then(avatar => {
-                const description = imageMetadata.illust.caption
-                  .replace(/<a[^>]*href=["|']([^"']*)[^>]*>([^<]+)<\/a>/gi, '[$2]($1)')
-                  .replace(/<br\s*\/?>/gi, '\n');
-                const embedFileName = imageData.resized ? match[0] + '.png' : fileName;
-                const embed = new Discord.MessageEmbed()
-                  .setTitle(imageMetadata.illust.title)
-                  .setDescription(description)
-                  .attachFiles([
-                    new Discord.MessageAttachment(imageData.image, embedFileName),
-                    new Discord.MessageAttachment(avatar, 'avatar.jpg'),
-                  ])
-                  .setAuthor('Pixiv', 'https://s.pximg.net/common/images/apple-touch-icon.png')
-                  .setImage('attachment://' + embedFileName)
-                  .setFooter(
-                    imageMetadata.illust.user.name +
-                      ' | ' +
-                      (imageData.resized ? 'Resized' : 'Original') +
-                      (imageMetadata.illust.metaPages.length > 0
-                        ? ' | 1 of ' + imageMetadata.illust.metaPages.length + ' images'
-                        : ''),
-                    'attachment://avatar.jpg',
-                  );
-                return message.channel.send(embed);
-              });
+          this.pixivClient.getImage(imageMetadata).then(imageData => {
+            return this.pixivClient.getAvatar(imageMetadata).then(avatar => {
+              const description = imageMetadata.illust.caption
+                .replace(/<a[^>]*href=["|']([^"']*)[^>]*>([^<]+)<\/a>/gi, '[$2]($1)')
+                .replace(/<br\s*\/?>/gi, '\n');
+              const embed = new Discord.MessageEmbed()
+                .setTitle(imageMetadata.illust.title)
+                .setDescription(description)
+                .attachFiles([
+                  new Discord.MessageAttachment(imageData, fileName),
+                  new Discord.MessageAttachment(avatar, 'avatar.jpg'),
+                ])
+                .setAuthor('Pixiv', 'https://s.pximg.net/common/images/apple-touch-icon.png')
+                .setImage('attachment://' + fileName)
+                .setFooter(
+                  imageMetadata.illust.user.name +
+                    ' | ' +
+                    (imageMetadata.illust.metaPages.length > 0
+                      ? ' | 1 of ' + imageMetadata.illust.metaPages.length + ' images'
+                      : ''),
+                  'attachment://avatar.jpg',
+                );
+              return message.channel.send(embed);
             });
+          });
         })
         .catch(SaberAlter.log.error);
     });
