@@ -40,12 +40,28 @@ export default function(cfg: config): logger {
     return s;
   }
 
+  /* eslint-disable no-console */
   function log(msg: string, level: keyof typeof colors): void {
     const c = colors[level || 'log'];
     msg = '[' + color(level.toUpperCase(), c) + '] ' + msg;
     if (cfg.timestamp) msg = color(fmt(cfg.timestamp), '30;1') + ' ' + msg;
-    // eslint-disable-next-line no-console
-    console.log(msg);
+    switch (level) {
+      case 'log':
+        console.log(msg);
+        break;
+      case 'info':
+        console.info(msg);
+        break;
+      case 'warn':
+        console.warn(msg);
+        break;
+      case 'debug':
+        console.debug(msg);
+        break;
+      case 'error':
+        console.error(msg);
+        break;
+    }
   }
 
   log.debug = function(format: string, ...param: string[]): void {
