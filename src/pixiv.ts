@@ -15,7 +15,8 @@ export default class pixiv {
       .login()
       .then(() => {
         SaberAlter.log.info('Pixiv login successful');
-        setTimeout(this.login.bind(this), this.pixivApi.authInfo().expiresIn * 1000);
+        const newTimeout = this.pixivApi.authInfo().expiresIn * 1000 - 30000;
+        setTimeout(this.login.bind(this), newTimeout);
       })
       .catch(SaberAlter.log.error);
   }
