@@ -1,5 +1,5 @@
 import anidbHandler from './message-handlers/anidb-handler';
-import Discord from 'discord.js';
+import Discord, { Partialize } from 'discord.js';
 import logger from './logger';
 import messageHandler from './message-handlers/message-handler';
 import pixivHandler from './message-handlers/pixiv-handler';
@@ -22,17 +22,17 @@ export default class SaberAlter {
     this.discordClient.login(process.env.DISCORD_TOKEN).catch(SaberAlter.log.error);
   }
 
-  private static partialHandler(
-    message: Discord.Message | Discord.PartialMessage,
-    callback: (message: Discord.Message) => void,
+  private static partialHandler<T extends { partial: false }, P extends Partialize<T>>(
+    object: T | P,
+    callback: (complete: T) => void,
   ): void {
-    if (message.partial) {
-      message
+    if (object.partial) {
+      object
         .fetch()
         .then(callback)
         .catch(SaberAlter.log.error);
     } else {
-      callback(message);
+      callback(object);
     }
   }
 
@@ -44,8 +44,17 @@ export default class SaberAlter {
     this.messageHandlers.push(new pixivHandler(this.discordClient));
 
     this.discordClient.on('message', message =>
-      SaberAlter.partialHandler(message, this.messageHandler),
+      SaberAlter.partialHandler<Discord.Message, Discord.PartialMessage>(
+        message,
+        this.messageHandler.bind(this),
+      ),
     );
+    this.discordClient.on('guildMemberAdd', member => {
+      SaberAlter.partialHandler<Discord.GuildMember, Discord.PartialGuildMember>(member, member => {
+        const role = member.guild.roles.find(role => role.name === 'Phuzed Sekai');
+        if (role) member.roles.add(role).catch(SaberAlter.log.error);
+      });
+    });
   }
 
   private messageHandler(message: Discord.Message): void {
