@@ -121,6 +121,21 @@ export default class roleHandler extends messageHandler {
       .first();
   }
 
+  private static parseArgs(command: string): string[] {
+    const split = [...command.matchAll(/[^\s"']+|"([^"]*)"|'([^']*)'/g)];
+    const args = [];
+    for (const arg of split) {
+      if (arg[1]) {
+        // we had a quoted argument
+        args.push(arg[1]);
+      } else {
+        // we had an unquoted parameter
+        args.push(arg[0]);
+      }
+    }
+    return args;
+  }
+
   handle(message: Discord.Message): void {
     if (message.guild === null) return; // roles don't exist in dm
     const match = this.match(message.content);
@@ -128,7 +143,7 @@ export default class roleHandler extends messageHandler {
 
     const guild = message.guild;
     const command = match[0][1];
-    const args = match[0][2] ? match[0][2].split(' ') : '';
+    const args = match[0][2] ? roleHandler.parseArgs(match[0][2]) : '';
 
     switch (command) {
       case '!roles':
