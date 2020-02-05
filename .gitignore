@@ -111,3 +111,6 @@ anidbCache/
 
 # build files
 build/
+
+# database
+database.db
