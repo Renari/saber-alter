@@ -64,7 +64,7 @@ export default class SaberAlter {
     // automatically assign the Phuzed Sekai role to new members
     this.discordClient.on('guildMemberAdd', member => {
       SaberAlter.partialHandler<Discord.GuildMember, Discord.PartialGuildMember>(member, member => {
-        const role = member.guild.roles.find(role => role.name === 'Phuzed Sekai');
+        const role = member.guild.roles.cache.find(role => role.name === 'Phuzed Sekai');
         if (role) member.roles.add(role).catch(SaberAlter.log.error);
       });
     });

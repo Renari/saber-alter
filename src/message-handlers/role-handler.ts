@@ -54,19 +54,19 @@ export default class roleHandler extends messageHandler {
       // was this a reaction to one of Sabers messages
       this.discordClient.user?.id === messageReaction.message.author.id &&
       // was this a reaction placed by Saber
-      messageReaction.users.has(this.discordClient.user.id)
+      messageReaction.users.cache.has(this.discordClient.user.id)
     ) {
       this.getRoles()
         .then(roles => {
           for (const role of roles) {
-            if (messageReaction.emoji === this.discordClient.emojis.get(role.emoji)) {
+            if (messageReaction.emoji === this.discordClient.emojis.cache.get(role.emoji)) {
               // get the discord role to apply
               const discordRole = this.getDiscordRole(guild, role.name);
               if (discordRole) {
                 SaberAlter.partialHandler<Discord.User, Discord.PartialUser>(user, completeUser => {
                   // give the user this role and remove their reaction
                   const member = guild.member(completeUser);
-                  if (member?.roles.has(discordRole.id)) {
+                  if (member?.roles.cache.has(discordRole.id)) {
                     // if they already have the role remove it
                     member.roles.remove(discordRole).then(() => {
                       messageReaction.message.channel.send(
@@ -114,7 +114,7 @@ export default class roleHandler extends messageHandler {
   }
 
   private getDiscordRole(guild: Discord.Guild, name: string): Discord.Role | undefined {
-    return guild.roles
+    return guild.roles.cache
       .filter(role => {
         return role.name.toLowerCase() === name.toLowerCase();
       })
@@ -156,7 +156,7 @@ export default class roleHandler extends messageHandler {
             const roleEmoji: Discord.GuildEmoji[] = [];
             let roleMessage = '>>> ';
             for (const role of roles) {
-              const emoji = this.discordClient.emojis.get(role.emoji);
+              const emoji = this.discordClient.emojis.cache.get(role.emoji);
               if (emoji) {
                 roleEmoji.push(emoji);
                 roleMessage += `${emoji}: ${role.name}\n`;
