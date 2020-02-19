@@ -75,7 +75,8 @@ export default class pixivHandler extends messageHandler {
             return this.pixivClient.getAvatar(imageMetadata).then(avatar => {
               const description = imageMetadata.illust.caption
                 .replace(/<a[^>]*href=["|']([^"']*)[^>]*>([^<]+)<\/a>/gi, '[$2]($1)')
-                .replace(/<br\s*\/?>/gi, '\n');
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<strong>([^<]+)<\/strong>/gi, '**$1**');
               const embed = new Discord.MessageEmbed()
                 .setTitle(imageMetadata.illust.title)
                 .setDescription(description)
