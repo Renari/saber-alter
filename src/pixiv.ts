@@ -1,6 +1,6 @@
 import { default as axios } from 'axios';
 import PixivAppApi from 'pixiv-app-api';
-import { PixivIllustDetail } from '~/node_modules/pixiv-app-api/dist/PixivTypes';
+import { PixivIllustDetail } from 'pixiv-app-api/dist/PixivTypes';
 import SaberAlter from './index';
 
 export default class pixiv {
