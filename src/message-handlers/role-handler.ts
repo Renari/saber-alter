@@ -4,7 +4,7 @@ import nedb from 'nedb';
 import SaberAlter from '../index';
 
 interface role {
-  name: 'string';
+  name: string;
   emoji: string;
 }
 
