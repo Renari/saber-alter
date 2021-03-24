@@ -51,7 +51,7 @@ export default class SaberAlter {
 
     // which message handlers we're loading
     this.messageHandlers.push(new anidbHandler());
-    this.messageHandlers.push(new pixivHandler(this.discordClient));
+    // this.messageHandlers.push(new pixivHandler(this.discordClient));
     this.messageHandlers.push(new roleHandler(this.discordClient, this.datastore));
 
     this.discordClient.on('message', message =>
