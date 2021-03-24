@@ -26,6 +26,7 @@
     "erlpack": "^0.1.3",
     "gm": "^1.23.1",
     "nedb": "^1.8.0",
+    "node-cron": "^3.0.0",
     "pixiv-app-api": "^1.2.1",
     "xml2js": "^0.4.23"
   },
@@ -33,6 +34,7 @@
     "@types/dateformat": "^3.0.1",
     "@types/gm": "^1.18.9",
     "@types/nedb": "^1.8.11",
+    "@types/node-cron": "^2.0.3",
     "@types/ws": "^7.4.0",
     "@types/xml2js": "^0.4.8",
     "@typescript-eslint/eslint-plugin": "^2.34.0",

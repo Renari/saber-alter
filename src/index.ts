@@ -9,6 +9,9 @@ import messageHandler from './message-handlers/message-handler';
 import pixivHandler from './message-handlers/pixiv-handler';
 import roleHandler from './message-handlers/role-handler';
 
+// notification handlers
+import genshinNotification from './notification-handlers/genshin-notifiaction';
+
 export default class SaberAlter {
   private readonly discordClient: Discord.Client;
   private readonly messageHandlers: messageHandler[] = [];
@@ -41,6 +44,11 @@ export default class SaberAlter {
     this.messageHandlers.push(new roleHandler(this.discordClient, this.datastore));
 
     this.discordClient.on('message', this.messageHandler.bind(this));
+
+    // notification handlers
+    if (process.env.TWITCH_CLIENT_ID) {
+      new genshinNotification(this.discordClient, '823615279522250792');
+    }
 
     // automatically assign the Phuzed Sekai role to new members
     this.discordClient.on('guildMemberAdd', member => {
