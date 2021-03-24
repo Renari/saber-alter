@@ -23,10 +23,10 @@ export default class anidbHandler extends messageHandler {
 
   handle(message: Discord.Message): void {
     const anidbAnimeMatches = this.match(message.content);
-    anidbAnimeMatches.forEach(match => {
+    anidbAnimeMatches.forEach((match) => {
       this.anidbClient
         .getShowData(match[1])
-        .then(data => {
+        .then((data) => {
           const embed = new Discord.MessageEmbed()
             .setTitle(data.anime.titles[0].title[0]._)
             .setAuthor(

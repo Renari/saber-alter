@@ -1,4 +1,4 @@
-import Discord, { Partialize } from 'discord.js';
+import Discord from 'discord.js';
 import logger from './logger';
 import nedb from 'nedb';
 import path from 'path';
@@ -51,8 +51,8 @@ export default class SaberAlter {
     }
 
     // automatically assign the Phuzed Sekai role to new members
-    this.discordClient.on('guildMemberAdd', member => {
-      const role = member.guild.roles.cache.find(role => role.name === 'Phuzed Sekai');
+    this.discordClient.on('guildMemberAdd', (member) => {
+      const role = member.guild.roles.cache.find((role) => role.name === 'Phuzed Sekai');
       if (role) member.roles.add(role).catch(SaberAlter.log.error);
     });
   }
@@ -61,7 +61,7 @@ export default class SaberAlter {
     // ignore own messages
     if (this.discordClient.user && message.author.equals(this.discordClient.user)) return;
     // run the message through each message handler
-    this.messageHandlers.forEach(handler => {
+    this.messageHandlers.forEach((handler) => {
       handler.handle(message);
     });
   }

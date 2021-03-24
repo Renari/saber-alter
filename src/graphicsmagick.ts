@@ -29,7 +29,7 @@ export async function scaleImageToSize(
 
   const gm = graphicsmagick(image, filename);
 
-  return new Promise<Buffer>(resolve => {
+  return new Promise<Buffer>((resolve) => {
     gm.scale(width, height).toBuffer('PNG', (err, buffer) => {
       SaberAlter.log.debug(
         'Image scaled to ' +

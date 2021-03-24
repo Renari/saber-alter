@@ -22,7 +22,7 @@ export default class pixiv {
   }
 
   public getImageDetail(id: number): Promise<PixivIllustDetail> {
-    return this.pixivApi.illustDetail(id).then(imageMetadata => {
+    return this.pixivApi.illustDetail(id).then((imageMetadata) => {
       return imageMetadata;
     });
   }
@@ -46,7 +46,7 @@ export default class pixiv {
         },
         responseType: 'arraybuffer',
       })
-      .then(response => {
+      .then((response) => {
         return Buffer.from(response.data, 'binary');
       });
   }

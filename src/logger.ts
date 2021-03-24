@@ -32,7 +32,7 @@ interface logger {
  * Logs a message to the console. The level is displayed in ANSI colors,
  * either bright red in case of an error or green otherwise.
  */
-export default function(cfg: config): logger {
+export default function (cfg: config): logger {
   function color(s: string, c: string): string {
     if (process.stdout.isTTY) {
       return '\x1B[' + c + 'm' + s + '\x1B[0m';
@@ -64,20 +64,20 @@ export default function(cfg: config): logger {
     }
   }
 
-  log.debug = function(format: string, ...param: string[]): void {
+  log.debug = function (format: string, ...param: string[]): void {
     if (!cfg.debug) return;
     log(util.format(format, ...param), 'debug');
   };
 
-  log.info = function(format: string, ...param: string[]): void {
+  log.info = function (format: string, ...param: string[]): void {
     log(util.format(format, ...param), 'info');
   };
 
-  log.warn = function(format: string, ...param: string[]): void {
+  log.warn = function (format: string, ...param: string[]): void {
     log(util.format(format, ...param), 'warn');
   };
 
-  log.error = function(format: string, ...param: string[]): void {
+  log.error = function (format: string, ...param: string[]): void {
     log(util.format(format, ...param), 'error');
   };
 

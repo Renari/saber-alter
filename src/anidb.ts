@@ -211,7 +211,7 @@ export default class anidb {
     // check if we have a cached response for this id
     if (fs.existsSync(cacheFilePath)) {
       // we have a cached file
-      return this.stat(cacheFilePath).then(stat => {
+      return this.stat(cacheFilePath).then((stat) => {
         if (new Date().getTime() - stat.birthtime.getTime() > 86400000) {
           // cached file is more than 24 hours old so delete it
           this.unlink(cacheFilePath).catch(); // ignore errors while trying to delete
@@ -227,9 +227,9 @@ export default class anidb {
   }
 
   private getCacheFile(cacheFilePath: string, id: string): Promise<AnimeResponse> {
-    return this.readFile(cacheFilePath).then(buffer => {
+    return this.readFile(cacheFilePath).then((buffer) => {
       SaberAlter.log.info('received show ' + id + ' from cache');
-      return this.xmlParser.parseStringPromise(buffer.toString()).then(parsed => {
+      return this.xmlParser.parseStringPromise(buffer.toString()).then((parsed) => {
         return parsed as AnimeResponse;
       });
     });
@@ -245,14 +245,14 @@ export default class anidb {
         // write our cache file for this show
         return this.writeFile(cacheFilePath, response.data).then(() => {
           SaberAlter.log.info('received show ' + id + ' from anidb');
-          return this.xmlParser.parseStringPromise(response.data).then(parsed => {
+          return this.xmlParser.parseStringPromise(response.data).then((parsed) => {
             if (parsed.error) throw parsed.error;
             return parsed as AnimeResponse;
           });
         });
       })
       .finally(() => {
-        new Promise(resolve => {
+        new Promise((resolve) => {
           setTimeout(resolve, 2000); // wait 2 seconds to avoid being banned by anidb
         }).then(() => {
           release(); // release mutux so next request can happen

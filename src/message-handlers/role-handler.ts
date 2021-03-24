@@ -57,7 +57,7 @@ export default class roleHandler extends messageHandler {
       messageReaction.users.cache.has(this.discordClient.user.id)
     ) {
       this.getRoles()
-        .then(roles => {
+        .then((roles) => {
           for (const role of roles) {
             if (messageReaction.emoji === this.discordClient.emojis.cache.get(role.emoji)) {
               // get the discord role to apply
@@ -107,15 +107,13 @@ export default class roleHandler extends messageHandler {
   }
 
   private deleteRole(guild: Discord.Guild, name: string): void {
-    this.getDiscordRole(guild, name)
-      ?.delete()
-      .catch(SaberAlter.log.error);
+    this.getDiscordRole(guild, name)?.delete().catch(SaberAlter.log.error);
     this.database.remove({ type: 'role', name });
   }
 
   private getDiscordRole(guild: Discord.Guild, name: string): Discord.Role | undefined {
     return guild.roles.cache
-      .filter(role => {
+      .filter((role) => {
         return role.name.toLowerCase() === name.toLowerCase();
       })
       .first();
@@ -148,7 +146,7 @@ export default class roleHandler extends messageHandler {
     switch (command) {
       case '!roles':
         this.getRoles()
-          .then(roles => {
+          .then((roles) => {
             if (roles.length === 0) {
               message.channel.send('There are currently no roles.');
               return;
@@ -165,7 +163,7 @@ export default class roleHandler extends messageHandler {
                 return;
               }
             }
-            message.channel.send(roleMessage).then(async roleMessage => {
+            message.channel.send(roleMessage).then(async (roleMessage) => {
               for (const emoji of roleEmoji) {
                 await roleMessage.react(emoji).catch(SaberAlter.log.error);
               }
@@ -207,7 +205,7 @@ export default class roleHandler extends messageHandler {
           return;
         }
         this.findRole(args[0])
-          .then(role => {
+          .then((role) => {
             if (role) {
               this.deleteRole(guild, role.name);
               message.react('✅');
