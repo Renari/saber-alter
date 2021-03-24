@@ -32,20 +32,6 @@ export default class SaberAlter {
     this.discordClient.login(process.env.DISCORD_TOKEN).catch(SaberAlter.log.error);
   }
 
-  public static partialHandler<T extends { partial: false }, P extends Partialize<T>>(
-    object: T | P,
-    callback: (complete: T) => void,
-  ): void {
-    if (object.partial) {
-      object
-        .fetch()
-        .then(callback)
-        .catch(SaberAlter.log.error);
-    } else {
-      callback(object);
-    }
-  }
-
   private ready(): void {
     SaberAlter.log.info('discord connection successful');
 
@@ -54,19 +40,12 @@ export default class SaberAlter {
     // this.messageHandlers.push(new pixivHandler(this.discordClient));
     this.messageHandlers.push(new roleHandler(this.discordClient, this.datastore));
 
-    this.discordClient.on('message', message =>
-      SaberAlter.partialHandler<Discord.Message, Discord.PartialMessage>(
-        message,
-        this.messageHandler.bind(this),
-      ),
-    );
+    this.discordClient.on('message', this.messageHandler.bind(this));
 
     // automatically assign the Phuzed Sekai role to new members
     this.discordClient.on('guildMemberAdd', member => {
-      SaberAlter.partialHandler<Discord.GuildMember, Discord.PartialGuildMember>(member, member => {
-        const role = member.guild.roles.cache.find(role => role.name === 'Phuzed Sekai');
-        if (role) member.roles.add(role).catch(SaberAlter.log.error);
-      });
+      const role = member.guild.roles.cache.find(role => role.name === 'Phuzed Sekai');
+      if (role) member.roles.add(role).catch(SaberAlter.log.error);
     });
   }
 
