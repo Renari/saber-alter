@@ -63,7 +63,7 @@ export default class roleHandler extends messageHandler {
               // get the discord role to apply
               const discordRole = this.getDiscordRole(guild, role.name);
               if (discordRole) {
-                SaberAlter.partialHandler<Discord.User, Discord.PartialUser>(user, completeUser => {
+                user.fetch().then((completeUser) => {
                   // give the user this role and remove their reaction
                   const member = guild.member(completeUser);
                   if (member?.roles.cache.has(discordRole.id)) {
