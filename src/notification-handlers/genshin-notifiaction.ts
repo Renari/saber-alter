@@ -6,11 +6,11 @@ export default class genshinNotification extends notificationHandler {
   constructor(discordClient: Discord.Client, channelId: string) {
     super(discordClient);
     cron.schedule(
-      '0 12 * * 3',
+      '0 12 * * 4',
       () => {
         this.sendDiscordMessage(
           channelId,
-          "Don't forget to buy your arifacts today! (also bug Arimil to make this better)",
+          "<@&674550059093983262> Don't forget to buy your arifacts today! (also bug Arimil to make this better)",
         );
       },
       {
