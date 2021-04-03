@@ -22,7 +22,7 @@
     "async-mutex": "^0.3.1",
     "axios": "^0.21.1",
     "dateformat": "^4.5.1",
-    "discord.js": "^12.5.1",
+    "discord.js": "^12.5.2",
     "erlpack": "^0.1.3",
     "gm": "^1.23.1",
     "nedb": "^1.8.0",
