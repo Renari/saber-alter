@@ -34,7 +34,7 @@
     "@types/dateformat": "^5.0.0",
     "@types/gm": "^1.18.11",
     "@types/nedb": "^1.8.12",
-    "@types/node-cron": "^3.0.0",
+    "@types/node-cron": "^3.0.1",
     "@types/ws": "^8.2.2",
     "@types/xml2js": "^0.4.9",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
