@@ -28,6 +28,7 @@
     "nedb": "^1.8.0",
     "node-cron": "^3.0.0",
     "pixiv-app-api": "^1.2.1",
+    "sqlite": "^4.0.23",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
