@@ -46,7 +46,7 @@ export default class SaberAlter {
     this.discordClient.on('message', this.messageHandler.bind(this));
 
     // genshin notification
-    new genshinNotification(this.discordClient, '823615279522250792');
+    // new genshinNotification(this.discordClient, '823615279522250792');
 
     // automatically assign the Phuzed Sekai role to new members
     this.discordClient.on('guildMemberAdd', (member) => {
