@@ -1,6 +1,6 @@
 import Discord from 'discord.js';
+import { Database } from 'better-sqlite3';
 import messageHandler from './message-handler';
-import nedb from 'nedb';
 import SaberAlter from '../index';
 
 interface role {
@@ -10,10 +10,20 @@ interface role {
 
 export default class roleHandler extends messageHandler {
   private readonly discordClient: Discord.Client;
-  private readonly database: nedb;
+  private readonly database: Database;
+  private readonly dbTableName: string = 'roles';
 
-  constructor(discordClient: Discord.Client, database: nedb) {
+  constructor(discordClient: Discord.Client, database: Database) {
     super();
+
+    // make sure our database table exists
+    // table does not exist so create it
+    database
+      .prepare(
+        `CREATE TABLE IF NOT EXISTS ${this.dbTableName} (name TEXT NOT NULL, emoji TEXT NOT NULL);`,
+      )
+      .run();
+
     this.discordClient = discordClient;
     this.database = database;
 
@@ -22,27 +32,37 @@ export default class roleHandler extends messageHandler {
 
   public findRole(name: string): Promise<role | null> {
     return new Promise<role>((resolve, reject) => {
-      this.database.findOne<role>({ type: 'role', name }, (err, role) => {
-        if (err) reject(err);
-        resolve(role);
-      });
+      const row = this.database
+        .prepare(`SELECT * FROM ${this.dbTableName} WHERE name = ?;`)
+        .get(name);
+      if (row !== undefined) {
+        resolve({
+          name: row.name,
+          emoji: row.emoji,
+        });
+      } else {
+        reject(`Could not find role ${name}`);
+      }
     });
   }
 
   public getRoles(): Promise<role[]> {
-    return new Promise<role[]>((resolve, reject) => {
-      this.database
-        .find<role>({ type: 'role' })
-        .sort({ name: 1 })
-        .exec((err, roles) => {
-          if (err) reject(err);
-          resolve(roles);
+    return new Promise<role[]>((resolve) => {
+      const rows = this.database.prepare(`SELECT name, emoji FROM ${this.dbTableName}`).all();
+
+      const roles: role[] = [];
+      for (const row of rows) {
+        roles.push({
+          name: row.name,
+          emoji: row.emoji,
         });
+      }
+      resolve(roles);
     });
   }
 
   private reactionHandler(
-    messageReaction: Discord.MessageReaction,
+    messageReaction: Discord.MessageReaction | Discord.PartialMessageReaction,
     user: Discord.User | Discord.PartialUser,
   ): void {
     if (messageReaction.message.guild === null) return; // ignore reactions in dm
@@ -51,8 +71,9 @@ export default class roleHandler extends messageHandler {
     const guild = messageReaction.message.guild;
 
     if (
+      this.discordClient.user !== null &&
       // was this a reaction to one of Sabers messages
-      this.discordClient.user?.id === messageReaction.message.author.id &&
+      this.discordClient.user.id === messageReaction.message.author?.id &&
       // was this a reaction placed by Saber
       messageReaction.users.cache.has(this.discordClient.user.id)
     ) {
@@ -65,24 +86,25 @@ export default class roleHandler extends messageHandler {
               if (discordRole) {
                 user.fetch().then((completeUser) => {
                   // give the user this role and remove their reaction
-                  const member = guild.member(completeUser);
-                  if (member?.roles.cache.has(discordRole.id)) {
-                    // if they already have the role remove it
-                    member.roles.remove(discordRole).then(() => {
-                      messageReaction.message.channel.send(
-                        `<@${completeUser.id}> removed you from ${role.name}`,
-                      );
-                    });
-                  } else {
-                    // else give them the role
-                    member?.roles.add(discordRole).then(() => {
-                      messageReaction.message.channel.send(
-                        `<@${completeUser.id}> added you to ${role.name}`,
-                      );
-                    });
-                  }
-                  // remove their reaction
-                  messageReaction.users.remove(completeUser).catch(SaberAlter.log.error);
+                  guild.members.fetch(completeUser).then((member) => {
+                    if (member?.roles.cache.has(discordRole.id)) {
+                      // if they already have the role remove it
+                      member.roles.remove(discordRole).then(() => {
+                        messageReaction.message.channel.send(
+                          `<@${completeUser.id}> removed you from ${role.name}`,
+                        );
+                      });
+                    } else {
+                      // else give them the role
+                      member?.roles.add(discordRole).then(() => {
+                        messageReaction.message.channel.send(
+                          `<@${completeUser.id}> added you to ${role.name}`,
+                        );
+                      });
+                    }
+                    // remove their reaction
+                    messageReaction.users.remove(completeUser).catch(SaberAlter.log.error);
+                  });
                 });
               } else {
                 // the role was deleted?
@@ -99,16 +121,23 @@ export default class roleHandler extends messageHandler {
   }
 
   private static isAdmin(user: Discord.GuildMember): boolean {
-    return user.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR);
+    return user.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR);
   }
 
   private upsertRole(name: string, emoji: string): void {
-    this.database.update({ type: 'role', name }, { type: 'role', name, emoji }, { upsert: true });
+    this.database
+      .prepare(`UPDATE ${this.dbTableName} SET name = ?, emoji = ? WHERE name = ?;`)
+      .run(name, emoji, name);
+    this.database
+      .prepare(
+        `INSERT INTO ${this.dbTableName} (name, emoji) SELECT ?, ? WHERE (SELECT Changes() = 0)`,
+      )
+      .run(name, emoji);
   }
 
   private deleteRole(guild: Discord.Guild, name: string): void {
     this.getDiscordRole(guild, name)?.delete().catch(SaberAlter.log.error);
-    this.database.remove({ type: 'role', name });
+    this.database.prepare(`DELETE FROM ${this.dbTableName} WHERE name = ?`).run(name);
   }
 
   private getDiscordRole(guild: Discord.Guild, name: string): Discord.Role | undefined {
@@ -188,10 +217,8 @@ export default class roleHandler extends messageHandler {
         if (!role) {
           guild.roles
             .create({
-              data: {
-                name: args[0],
-                mentionable: true,
-              },
+              name: args[0],
+              mentionable: true,
             })
             .catch(SaberAlter.log.error);
         }

@@ -1,21 +1,16 @@
-import Discord, { ClientOptions } from 'discord.js';
+import Discord, { ClientOptions, Intents } from 'discord.js';
 import logger from './logger';
-import nedb from 'nedb';
-import path from 'path';
+import Database from 'better-sqlite3';
 
 // message handlers
 import anidbHandler from './message-handlers/anidb-handler';
 import messageHandler from './message-handlers/message-handler';
-import pixivHandler from './message-handlers/pixiv-handler';
 import roleHandler from './message-handlers/role-handler';
-
-// notification handlers
-import genshinNotification from './notification-handlers/genshin-notifiaction';
 
 export default class SaberAlter {
   private readonly discordClient: Discord.Client;
   private readonly messageHandlers: messageHandler[] = [];
-  private readonly datastore: nedb;
+  private readonly datastore: Database.Database;
 
   public static readonly log = logger({
     timestamp: 'mm/dd/yy HH:MM:ss',
@@ -23,11 +18,14 @@ export default class SaberAlter {
   });
 
   constructor() {
-    this.datastore = new nedb({
-      filename: path.resolve('database.db'),
-      autoload: true,
-    });
-    this.discordClient = new Discord.Client({} as ClientOptions);
+    this.datastore = new Database('database.db', {});
+    this.discordClient = new Discord.Client({
+      intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+      ],
+    } as ClientOptions);
 
     this.discordClient.once('ready', () => this.ready());
 
@@ -40,13 +38,9 @@ export default class SaberAlter {
 
     // which message handlers we're loading
     this.messageHandlers.push(new anidbHandler());
-    // this.messageHandlers.push(new pixivHandler(this.discordClient));
     this.messageHandlers.push(new roleHandler(this.discordClient, this.datastore));
 
-    this.discordClient.on('message', this.messageHandler.bind(this));
-
-    // genshin notification
-    // new genshinNotification(this.discordClient, '823615279522250792');
+    this.discordClient.on('messageCreate', this.messageHandler.bind(this));
 
     // automatically assign the Phuzed Sekai role to new members
     this.discordClient.on('guildMemberAdd', (member) => {
