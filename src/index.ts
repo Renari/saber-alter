@@ -1,4 +1,4 @@
-import Discord from 'discord.js';
+import Discord, { ClientOptions } from 'discord.js';
 import logger from './logger';
 import nedb from 'nedb';
 import path from 'path';
@@ -27,7 +27,7 @@ export default class SaberAlter {
       filename: path.resolve('database.db'),
       autoload: true,
     });
-    this.discordClient = new Discord.Client();
+    this.discordClient = new Discord.Client({} as ClientOptions);
 
     this.discordClient.once('ready', () => this.ready());
 
