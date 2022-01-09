@@ -38,7 +38,11 @@ export default class anidbHandler extends messageHandler {
             .setThumbnail('https://cdn.anidb.net/images/main/' + data.anime.picture)
             .setURL(match[0])
             .addField('Episodes', data.anime.episodecount[0]);
-          return message.channel.send(embed);
+          return message.reply({
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            embeds: embed,
+          });
         })
         .catch(SaberAlter.log.error);
     });
