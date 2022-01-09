@@ -1,16 +1,23 @@
+import Database from 'better-sqlite3';
 import Discord, { ClientOptions, Intents } from 'discord.js';
 import logger from './logger';
-import Database from 'better-sqlite3';
 
 // message handlers
 import anidbHandler from './message-handlers/anidb-handler';
 import messageHandler from './message-handlers/message-handler';
-import roleHandler from './message-handlers/role-handler';
+import roleHandler from './command-handlers/role-handler';
 
 export default class SaberAlter {
-  private readonly discordClient: Discord.Client;
+  public readonly datastore: Database.Database = new Database('database.db', {});
+  public readonly discordClient: Discord.Client = new Discord.Client({
+    intents: [
+      Intents.FLAGS.GUILDS,
+      Intents.FLAGS.GUILD_MESSAGES,
+      Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    ],
+  } as ClientOptions);
+
   private readonly messageHandlers: messageHandler[] = [];
-  private readonly datastore: Database.Database;
 
   public static readonly log = logger({
     timestamp: 'mm/dd/yy HH:MM:ss',
@@ -18,19 +25,12 @@ export default class SaberAlter {
   });
 
   constructor() {
-    this.datastore = new Database('database.db', {});
-    this.discordClient = new Discord.Client({
-      intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      ],
-    } as ClientOptions);
-
     this.discordClient.once('ready', () => this.ready());
 
     // connect to discord
-    this.discordClient.login(process.env.DISCORD_TOKEN).catch(SaberAlter.log.error);
+    if (process.env.DISCORD_TOKEN) {
+      this.discordClient.login(process.env.DISCORD_TOKEN).catch(SaberAlter.log.error);
+    }
   }
 
   private ready(): void {
@@ -38,7 +38,15 @@ export default class SaberAlter {
 
     // which message handlers we're loading
     this.messageHandlers.push(new anidbHandler());
-    this.messageHandlers.push(new roleHandler(this.discordClient, this.datastore));
+
+    // which command handlers we're loading
+    this.discordClient.guilds.fetch().then((guilds) => {
+      for (const [id, oAuthGuild] of guilds) {
+        oAuthGuild.fetch().then((guild) => {
+          new roleHandler(this.discordClient, this.datastore, guild);
+        });
+      }
+    });
 
     this.discordClient.on('messageCreate', this.messageHandler.bind(this));
 
