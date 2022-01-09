@@ -177,7 +177,7 @@ export default class roleHandler {
   public getRoles(): Promise<role[]> {
     return new Promise<role[]>((resolve) => {
       const rows = this.database
-        .prepare(`SELECT name FROM ${this.dbTableName} WHERE guild = ?`)
+        .prepare(`SELECT name FROM ${this.dbTableName} WHERE guild = ? ORDER BY name ASC`)
         .all(this.guild.id);
 
       const roles: role[] = [];
