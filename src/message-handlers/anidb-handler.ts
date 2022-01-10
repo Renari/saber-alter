@@ -29,11 +29,11 @@ export default class anidbHandler extends messageHandler {
         .then((data) => {
           const embed = new Discord.MessageEmbed()
             .setTitle(data.anime.titles[0].title[0]._)
-            .setAuthor(
-              data.anime.url[0],
-              'https://cdn.anidb.net/css/icons/touch/favicon-32x32.png',
-              data.anime.url[0],
-            )
+            .setAuthor({
+              name: data.anime.url[0],
+              url: data.anime.url[0],
+              iconURL: 'https://cdn.anidb.net/css/icons/touch/favicon-32x32.png',
+            })
             .setDescription(anidbHandler.formatDiscordMessage(data.anime.description[0]))
             .setThumbnail('https://cdn.anidb.net/images/main/' + data.anime.picture)
             .setURL(match[0])
