@@ -3,7 +3,7 @@
  * https://github.com/whitecolor/ts-node-dev/blob/master/lib/log.js
  */
 import util from 'util';
-import fmt from 'dateformat';
+import dateformat from 'dateformat';
 
 const colors = {
   info: '36',
@@ -44,7 +44,7 @@ export default function (cfg: config): logger {
   function log(msg: string, level: keyof typeof colors): void {
     const c = colors[level || 'log'];
     msg = '[' + color(level.toUpperCase(), c) + '] ' + msg;
-    if (cfg.timestamp) msg = color(fmt(cfg.timestamp), '30;1') + ' ' + msg;
+    if (cfg.timestamp) msg = color(dateformat(cfg.timestamp), '30;1') + ' ' + msg;
     switch (level) {
       case 'log':
         console.log(msg);
