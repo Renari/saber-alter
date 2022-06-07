@@ -28,7 +28,7 @@
     "discord.js": "^13.8.0",
     "erlpack": "^0.1.4",
     "gm": "^1.23.1",
-    "node-cron": "^3.0.0",
+    "node-cron": "^3.0.1",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
