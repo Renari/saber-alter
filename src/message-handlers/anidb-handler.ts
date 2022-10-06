@@ -1,5 +1,5 @@
 import anidb from '../anidb';
-import Discord from 'discord.js';
+import Discord, { EmbedBuilder } from 'discord.js';
 import messageHandler from './message-handler';
 import SaberAlter from '../index';
 
@@ -27,7 +27,7 @@ export default class anidbHandler extends messageHandler {
       this.anidbClient
         .getShowData(match[1])
         .then((data) => {
-          const embed = new Discord.MessageEmbed()
+          const embed = new EmbedBuilder()
             .setTitle(data.anime.titles[0].title[0]._)
             .setAuthor({
               name: data.anime.url[0],
@@ -37,7 +37,10 @@ export default class anidbHandler extends messageHandler {
             .setDescription(anidbHandler.formatDiscordMessage(data.anime.description[0]))
             .setThumbnail('https://cdn.anidb.net/images/main/' + data.anime.picture)
             .setURL(match[0])
-            .addField('Episodes', data.anime.episodecount[0]);
+            .addFields({
+              name: 'Episodes',
+              value: data.anime.episodecount[0],
+            });
           return message.reply({
             embeds: [embed],
           });

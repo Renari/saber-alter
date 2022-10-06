@@ -1,4 +1,8 @@
-import Discord, { ApplicationCommandPermissionData, Permissions } from 'discord.js';
+import Discord, {
+  APIApplicationCommandOptionChoice,
+  ChatInputCommandInteraction,
+  PermissionsBitField,
+} from 'discord.js';
 import { Database } from 'better-sqlite3';
 import SaberAlter from '../index';
 import { SlashCommandBuilder } from '@discordjs/builders';
@@ -43,6 +47,7 @@ export default class roleHandler {
 
   private interactionCreate(interaction: Discord.Interaction) {
     if (!interaction.isCommand() || this.guild !== interaction.guild) return;
+    interaction = interaction as ChatInputCommandInteraction;
 
     switch (interaction.commandName) {
       case 'addrole': {
@@ -98,7 +103,7 @@ export default class roleHandler {
         }
         this.findRole(roleName).then((role) => {
           if (!role) {
-            interaction
+            (interaction as ChatInputCommandInteraction)
               .reply({ content: 'That role does not exist or is not join-able.', ephemeral: true })
               .catch(SaberAlter.log.error);
             return;
@@ -107,13 +112,13 @@ export default class roleHandler {
             const discordRole = this.getDiscordRole(role.name);
             if (discordRole) {
               guildMember.roles.add(discordRole).catch(SaberAlter.log.error);
-              interaction
+              (interaction as ChatInputCommandInteraction)
                 .reply({ content: `You've joined ${role.name}.`, ephemeral: true })
                 .catch(SaberAlter.log.error);
             } else {
               // role was manually deleted?
               this.deleteRole(role.name);
-              interaction
+              (interaction as ChatInputCommandInteraction)
                 .reply({ content: `${role.name} doesn't exist anymore.`, ephemeral: true })
                 .catch(SaberAlter.log.error);
             }
@@ -131,7 +136,7 @@ export default class roleHandler {
         }
         this.findRole(roleName).then((role) => {
           if (!role) {
-            interaction
+            (interaction as ChatInputCommandInteraction)
               .reply({ content: 'That role does not exist or cannot be left.', ephemeral: true })
               .catch(SaberAlter.log.error);
             return;
@@ -140,13 +145,13 @@ export default class roleHandler {
             const discordRole = this.getDiscordRole(role.name);
             if (discordRole) {
               guildMember.roles.remove(discordRole).catch(SaberAlter.log.error);
-              interaction
+              (interaction as ChatInputCommandInteraction)
                 .reply({ content: `You've left ${role.name}.`, ephemeral: true })
                 .catch(SaberAlter.log.error);
             } else {
               // role was manually deleted?
               this.deleteRole(role.name);
-              interaction
+              (interaction as ChatInputCommandInteraction)
                 .reply({ content: `${role.name} doesn't exist anymore.`, ephemeral: true })
                 .catch(SaberAlter.log.error);
             }
@@ -218,20 +223,12 @@ export default class roleHandler {
 
   private registerCommands() {
     this.getRoles().then((roles) => {
-      const adminCommandPermissions: ApplicationCommandPermissionData[] = [];
-      for (const [id, role] of this.guild.roles.cache) {
-        if (role.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
-          adminCommandPermissions.push({
-            id,
-            type: 'ROLE',
-            permission: true,
-          });
-        }
-      }
-
-      const roleChoices: [string, string][] = [];
+      const roleChoices: APIApplicationCommandOptionChoice<string>[] = [];
       for (const role of roles) {
-        roleChoices.push([role.name, role.name]);
+        roleChoices.push({
+          name: role.name,
+          value: role.name,
+        });
       }
       // join command
       this.guild.commands
@@ -243,7 +240,7 @@ export default class roleHandler {
               return option
                 .setName('role')
                 .setDescription('Which role would you like to join?')
-                .addChoices(roleChoices)
+                .addChoices(...roleChoices)
                 .setRequired(true);
             })
             .toJSON(),
@@ -260,7 +257,7 @@ export default class roleHandler {
               return option
                 .setName('role')
                 .setDescription('Which role would you like to leave?')
-                .addChoices(roleChoices)
+                .addChoices(...roleChoices)
                 .setRequired(true);
             })
             .toJSON(),
@@ -273,23 +270,17 @@ export default class roleHandler {
           new SlashCommandBuilder()
             .setName('removerole')
             .setDescription('Remove a joinable role.')
-            .setDefaultPermission(false)
+            .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
             .addStringOption((option) => {
               return option
                 .setName('role')
                 .setDescription('Which role would you like to remove?')
-                .addChoices(roleChoices)
+                .addChoices(...roleChoices)
                 .setRequired(true);
             })
             .toJSON(),
         )
-        .then((command) => {
-          command.permissions
-            .add({
-              permissions: adminCommandPermissions,
-            })
-            .catch(SaberAlter.log.error);
-        });
+        .catch(SaberAlter.log.error);
 
       // roleadd command
       this.guild.commands
@@ -297,7 +288,7 @@ export default class roleHandler {
           new SlashCommandBuilder()
             .setName('addrole')
             .setDescription('Add a joinable role.')
-            .setDefaultPermission(false)
+            .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
             .addStringOption((option) => {
               return option
                 .setName('role')
@@ -312,13 +303,7 @@ export default class roleHandler {
             // })
             .toJSON(),
         )
-        .then((command) => {
-          command.permissions
-            .add({
-              permissions: adminCommandPermissions,
-            })
-            .catch(SaberAlter.log.error);
-        });
+        .catch(SaberAlter.log.error);
     });
   }
 }

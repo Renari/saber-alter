@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import Discord, { ClientOptions, Intents } from 'discord.js';
+import Discord, { ClientOptions, GatewayIntentBits } from 'discord.js';
 import logger from './logger';
 
 // message handlers
@@ -11,9 +11,9 @@ export default class SaberAlter {
   public readonly datastore: Database.Database = new Database('database.db', {});
   public readonly discordClient: Discord.Client = new Discord.Client({
     intents: [
-      Intents.FLAGS.GUILDS,
-      Intents.FLAGS.GUILD_MESSAGES,
-      Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.GuildMessageReactions,
     ],
   } as ClientOptions);
 
@@ -41,7 +41,7 @@ export default class SaberAlter {
 
     // which command handlers we're loading
     this.discordClient.guilds.fetch().then((guilds) => {
-      for (const [id, oAuthGuild] of guilds) {
+      for (const [, oAuthGuild] of guilds) {
         oAuthGuild.fetch().then((guild) => {
           new roleHandler(this.discordClient, this.datastore, guild);
         });
