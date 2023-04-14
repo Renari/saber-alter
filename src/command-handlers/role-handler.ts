@@ -11,6 +11,10 @@ interface role {
   name: string;
 }
 
+interface databaseRole extends role {
+  guild: string;
+}
+
 export default class roleHandler {
   private readonly discordClient: Discord.Client;
   private readonly database: Database;
@@ -168,11 +172,9 @@ export default class roleHandler {
     return new Promise<role>((resolve, reject) => {
       const row = this.database
         .prepare(`SELECT * FROM ${this.dbTableName} WHERE name = ? AND guild = ?;`)
-        .get(name, this.guild.id);
-      if (row !== undefined) {
-        resolve({
-          name: row.name,
-        });
+        .get(name, this.guild.id) as databaseRole;
+      if (row !== undefined && row !== null) {
+        resolve(row);
       } else {
         reject(`Could not find role ${name}`);
       }
@@ -183,15 +185,9 @@ export default class roleHandler {
     return new Promise<role[]>((resolve) => {
       const rows = this.database
         .prepare(`SELECT name FROM ${this.dbTableName} WHERE guild = ? ORDER BY name ASC`)
-        .all(this.guild.id);
+        .all(this.guild.id) as role[];
 
-      const roles: role[] = [];
-      for (const row of rows) {
-        roles.push({
-          name: row.name,
-        });
-      }
-      resolve(roles);
+      resolve(rows);
     });
   }
 
