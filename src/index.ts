@@ -11,9 +11,10 @@ export default class SaberAlter {
   public readonly datastore: Database.Database = new Database('database.db', {});
   public readonly discordClient: Discord.Client = new Discord.Client({
     intents: [
-      GatewayIntentBits.Guilds,
-      GatewayIntentBits.GuildMessages,
       GatewayIntentBits.GuildMessageReactions,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.MessageContent,
     ],
   } as ClientOptions);
 
