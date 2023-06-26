@@ -37,7 +37,7 @@
     "@types/gm": "^1.25.1",
     "@types/nedb": "^1.8.12",
     "@types/node": "^20.3.1",
-    "@types/node-cron": "^3.0.7",
+    "@types/node-cron": "^3.0.8",
     "@types/ws": "^8.5.5",
     "@types/xml2js": "^0.4.11",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
