@@ -20,7 +20,7 @@
   "homepage": "https://github.com/Renari/saber-alter#readme",
   "dependencies": {
     "@discordjs/builders": "^1.6.3",
-    "@discordjs/rest": "^2.0.0",
+    "@discordjs/rest": "^2.0.1",
     "async-mutex": "^0.4.0",
     "axios": "^1.4.0",
     "better-sqlite3": "^8.5.0",
