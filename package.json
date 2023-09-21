@@ -34,7 +34,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.5",
     "@types/dateformat": "^3.0.1",
-    "@types/gm": "^1.25.1",
+    "@types/gm": "^1.25.2",
     "@types/nedb": "^1.8.12",
     "@types/node": "^20.6.3",
     "@types/node-cron": "^3.0.8",
