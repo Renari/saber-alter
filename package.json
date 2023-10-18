@@ -32,7 +32,7 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.5",
+    "@types/better-sqlite3": "^7.6.6",
     "@types/dateformat": "^3.0.1",
     "@types/gm": "^1.25.3",
     "@types/nedb": "^1.8.14",
