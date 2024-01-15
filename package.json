@@ -36,7 +36,7 @@
     "@types/dateformat": "^5.0.2",
     "@types/gm": "^1.25.4",
     "@types/nedb": "^1.8.16",
-    "@types/node": "^20.10.8",
+    "@types/node": "^20.11.1",
     "@types/node-cron": "^3.0.10",
     "@types/ws": "^8.5.10",
     "@types/xml2js": "^0.4.14",
