@@ -22,7 +22,7 @@
     "@discordjs/builders": "^1.8.1",
     "@discordjs/rest": "^2.2.0",
     "async-mutex": "^0.5.0",
-    "axios": "^1.7.1",
+    "axios": "^1.7.2",
     "better-sqlite3": "^10.0.0",
     "dateformat": "^5.0.3",
     "discord.js": "^14.15.2",
