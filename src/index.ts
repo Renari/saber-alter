@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import Discord, { ClientOptions, GatewayIntentBits } from 'discord.js';
+import Ub from './ubc/ub';
 import logger from './logger';
 
 // message handlers
@@ -26,8 +27,8 @@ export default class SaberAlter {
   });
 
   constructor() {
+    new Ub();
     this.discordClient.once('ready', () => this.ready());
-
     // connect to discord
     if (process.env.DISCORD_TOKEN) {
       this.discordClient.login(process.env.DISCORD_TOKEN).catch(SaberAlter.log.error);
