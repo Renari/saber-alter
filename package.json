@@ -26,7 +26,7 @@
     "better-sqlite3": "^11.7.2",
     "dateformat": "^4.6.3",
     "discord-user-bots": "^2.0.2",
-    "discord.js": "^14.17.2",
+    "discord.js": "^14.17.3",
     "erlpack": "^0.1.4",
     "node-cron": "^3.0.2",
     "xml2js": "^0.6.2"
