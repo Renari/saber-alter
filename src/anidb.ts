@@ -252,11 +252,7 @@ export default class anidb {
         });
       })
       .finally(() => {
-        new Promise((resolve) => {
-          setTimeout(resolve, 2000); // wait 2 seconds to avoid being banned by anidb
-        }).then(() => {
-          release(); // release mutux so next request can happen
-        });
+        setTimeout(release, 4000); // wait 4 seconds to avoid being banned by anidb
       });
   }
 }
