@@ -204,35 +204,32 @@ export default class anidb {
     }
   }
 
-  public getShowData(
+  public async getShowData(
     id: string,
     cacheFilePath: string = path.join(this.cacheDir, id),
   ): Promise<AnimeResponse> {
     // check if we have a cached response for this id
     if (fs.existsSync(cacheFilePath)) {
       // we have a cached file
-      return this.stat(cacheFilePath).then((stat) => {
-        if (new Date().getTime() - stat.birthtime.getTime() > 86400000) {
-          // cached file is more than 24 hours old so delete it
-          this.unlink(cacheFilePath).catch(); // ignore errors while trying to delete
-          return this.requestShowData(cacheFilePath, id);
-        } else {
-          return this.getCacheFile(cacheFilePath, id);
-        }
-      });
+      const stat = await this.stat(cacheFilePath);
+      if (new Date().getTime() - stat.birthtime.getTime() > 86400000) {
+        // cached file is more than 24 hours old so delete it
+        this.unlink(cacheFilePath).catch(); // ignore errors while trying to delete
+        return this.requestShowData(cacheFilePath, id);
+      } else {
+        return this.getCacheFile(cacheFilePath, id);
+      }
     } else {
       // we do not have a cached copy of this request
       return this.requestShowData(cacheFilePath, id);
     }
   }
 
-  private getCacheFile(cacheFilePath: string, id: string): Promise<AnimeResponse> {
-    return this.readFile(cacheFilePath).then((buffer) => {
-      SaberAlter.log.info('received show ' + id + ' from cache');
-      return this.xmlParser.parseStringPromise(buffer.toString()).then((parsed) => {
-        return parsed as AnimeResponse;
-      });
-    });
+  private async getCacheFile(cacheFilePath: string, id: string): Promise<AnimeResponse> {
+    const buffer = await this.readFile(cacheFilePath);
+    SaberAlter.log.info('received show ' + id + ' from cache');
+    const parsed = await this.xmlParser.parseStringPromise(buffer.toString());
+    return parsed as AnimeResponse;
   }
 
   private async requestShowData(cacheFilePath: string, id: string): Promise<AnimeResponse> {
@@ -241,15 +238,13 @@ export default class anidb {
     if (fs.existsSync(cacheFilePath)) return this.getCacheFile(cacheFilePath, id);
     return axios
       .get(this.baseUrl + '&request=anime&aid=' + id)
-      .then((response: AxiosResponse) => {
+      .then(async (response: AxiosResponse) => {
         // write our cache file for this show
-        return this.writeFile(cacheFilePath, response.data).then(() => {
-          SaberAlter.log.info('received show ' + id + ' from anidb');
-          return this.xmlParser.parseStringPromise(response.data).then((parsed) => {
-            if (parsed.error) throw parsed.error;
-            return parsed as AnimeResponse;
-          });
-        });
+        await this.writeFile(cacheFilePath, response.data);
+        SaberAlter.log.info('received show ' + id + ' from anidb');
+        const parsed = await this.xmlParser.parseStringPromise(response.data);
+        if (parsed.error) throw parsed.error;
+        return parsed as AnimeResponse;
       })
       .finally(() => {
         setTimeout(release, 4000); // wait 4 seconds to avoid being banned by anidb
