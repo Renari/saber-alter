@@ -25,7 +25,7 @@
     "axios": "^1.8.3",
     "better-sqlite3": "^11.9.0",
     "dateformat": "^4.6.3",
-    "discord-user-bots": "^2.0.2",
+    "discord-user-bots": "^2.0.3",
     "discord.js": "^14.18.0",
     "node-cron": "^3.0.2",
     "xml2js": "^0.6.2"
