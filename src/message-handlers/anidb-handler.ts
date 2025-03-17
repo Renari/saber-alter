@@ -43,6 +43,7 @@ export default class anidbHandler extends messageHandler {
             });
           return message.reply({
             embeds: [embed],
+            allowedMentions: { repliedUser: false },
           });
         })
         .catch(SaberAlter.log.error);
