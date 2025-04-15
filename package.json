@@ -38,7 +38,7 @@
     "@types/node-cron": "^3.0.10",
     "@types/ws": "^8.18.1",
     "@types/xml2js": "^0.4.14",
-    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "@typescript-eslint/eslint-plugin": "^8.30.1",
     "@typescript-eslint/parser": "^8.30.1",
     "dotenv": "^16.5.0",
     "eslint": "^9.24.0",
