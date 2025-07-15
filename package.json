@@ -39,7 +39,7 @@
     "@types/ws": "^8.18.1",
     "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^8.36.0",
-    "@typescript-eslint/parser": "^8.35.1",
+    "@typescript-eslint/parser": "^8.37.0",
     "dotenv": "^17.2.0",
     "eslint": "^9.31.0",
     "eslint-config-prettier": "^10.1.5",
