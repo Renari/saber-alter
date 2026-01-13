@@ -34,7 +34,7 @@
     "@types/better-sqlite3": "^7.6.13",
     "@types/dateformat": "^3.0.1",
     "@types/nedb": "^1.8.16",
-    "@types/node": "^25.0.6",
+    "@types/node": "^25.0.7",
     "@types/node-cron": "^3.0.10",
     "@types/ws": "^8.18.1",
     "@types/xml2js": "^0.4.14",
