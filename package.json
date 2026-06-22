@@ -27,7 +27,7 @@
     "dateformat": "^4.6.3",
     "discord-user-bots": "^2.0.3",
     "discord.js": "^14.26.4",
-    "node-cron": "^4.4.1",
+    "node-cron": "^4.5.0",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
