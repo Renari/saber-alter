@@ -24,7 +24,7 @@
     "async-mutex": "^0.5.0",
     "axios": "^1.20.0",
     "better-sqlite3": "^13.0.3",
-    "dateformat": "^4.6.3",
+    "dateformat": "^5.0.4",
     "discord-user-bots": "^2.0.3",
     "discord.js": "^14.27.0",
     "node-cron": "^4.6.0",
@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",
-    "@types/dateformat": "^3.0.1",
+    "@types/dateformat": "^5.0.3",
     "@types/nedb": "^1.8.16",
     "@types/node": "^26.6.5",
     "@types/node-cron": "^3.0.11",
