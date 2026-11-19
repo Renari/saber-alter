@@ -1,10 +1,10 @@
 import Database from 'better-sqlite3';
 import Discord, { ClientOptions, GatewayIntentBits } from 'discord.js';
-import Ub from './ubc/ub';
 import logger from './logger';
 
 // message handlers
 import anidbHandler from './message-handlers/anidb-handler';
+import twitterRelayHandler from './message-handlers/twitter-relay-handler';
 import messageHandler from './message-handlers/message-handler';
 import roleHandler from './command-handlers/role-handler';
 
@@ -27,7 +27,6 @@ export default class SaberAlter {
   });
 
   constructor() {
-    new Ub();
     this.discordClient.once('ready', () => this.ready());
     // connect to discord
     if (process.env.DISCORD_TOKEN) {
@@ -40,6 +39,9 @@ export default class SaberAlter {
 
     // which message handlers we're loading
     this.messageHandlers.push(new anidbHandler());
+    if (process.env.TWITTER_RELAY_WEBHOOK) {
+      this.messageHandlers.push(new twitterRelayHandler(process.env.TWITTER_RELAY_WEBHOOK));
+    }
 
     // which command handlers we're loading
     this.discordClient.guilds.fetch().then((guilds) => {
